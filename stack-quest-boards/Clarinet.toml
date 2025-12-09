@@ -1,0 +1,48 @@
+[project]
+name = 'stack-quest-boards'
+description = ''
+authors = []
+telemetry = false
+cache_dir = './.cache'
+requirements = []
+[contracts.badge-nft]
+path = 'contracts/badge-nft.clar'
+clarity_version = 3
+epoch = '3.2'
+
+[contracts.math-helpers]
+path = 'contracts/math-helpers.clar'
+clarity_version = 3
+epoch = 'latest'
+
+[contracts.quest-progress]
+path = 'contracts/quest-progress.clar'
+clarity_version = 3
+epoch = '3.2'
+
+[contracts.quest-registry]
+path = 'contracts/quest-registry.clar'
+clarity_version = 3
+epoch = '3.2'
+
+[contracts.quest-types]
+path = 'contracts/quest-types.clar'
+clarity_version = 3
+epoch = '3.2'
+
+[contracts.xp-ledger]
+path = 'contracts/xp-ledger.clar'
+clarity_version = 3
+epoch = '3.2'
+[repl.analysis]
+passes = ['check_checker']
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
+
+[repl.remote_data]
+enabled = false
+api_url = 'https://api.hiro.so'
