@@ -32,7 +32,7 @@
 (define-map token-uri { id: uint } { uri: (string-utf8 256) })
 (define-map token-minter { id: uint } { minter: principal })
 (define-private (is-owner (who principal))
-  (is-eq who contract-owner))
+  (is-eq who (var-get contract-admin)))
 (define-private (is-minter (who principal))
   (is-eq who (var-get authorized-minter)))
 (define-private (assert-owner (who principal))
