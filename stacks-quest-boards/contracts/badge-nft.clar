@@ -27,3 +27,5 @@
   (is-eq who (var-get authorized-minter)))
 (define-private (assert-owner (who principal))
   (if (is-owner who) true err-not-owner))
+(define-private (assert-minter (who principal))
+  (if (is-minter who) true err-not-minter))
