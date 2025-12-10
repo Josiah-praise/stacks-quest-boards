@@ -23,3 +23,5 @@
 (define-map token-uri { id: uint } { uri: (string-utf8 256) })
 (define-private (is-owner (who principal))
   (is-eq who contract-owner))
+(define-private (is-minter (who principal))
+  (is-eq who (var-get authorized-minter)))
