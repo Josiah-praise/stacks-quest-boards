@@ -132,3 +132,7 @@
 ;; read: token exists?
 (define-read-only (token-exists (id uint))
   (ok (is-some (nft-get-owner? badge id))))
+
+;; read: contract owner
+(define-read-only (get-owner-principal)
+  (ok contract-owner))
