@@ -208,6 +208,24 @@
           id (begin (print { event: "mint", id: id, to: recipient, uri: uri }) result)
           err result)))))
 
+;; public: burn token (owner only, if enabled)
+(define-public (burn (token-id uint))
+  (match (get-owner-or-err token-id)
+    owner
+      (if (is-eq true (var-get burn-enabled))
+          (if (is-eq owner tx-sender)
+              (let ((res (nft-burn? badge token-id owner)))
+                (match res
+                  ok (begin
+                        (clear-uri! token-id)
+                        (decrement-supply)
+                        (print { event: "burn", id: token-id, by: tx-sender })
+                        res)
+                  err res))
+              err-not-token-owner)
+          err-burn-disabled)
+    err err))
+
 ;; read: token exists?
 (define-read-only (token-exists (id uint))
   (ok (is-some (nft-get-owner? badge id))))
