@@ -25,6 +25,7 @@
 (define-data-var total-supply uint u0)
 (define-data-var mint-paused bool false)
 (define-data-var metadata-locked bool false)
+(define-data-var burn-enabled bool false)
 (define-map token-uri { id: uint } { uri: (string-utf8 256) })
 (define-private (is-owner (who principal))
   (is-eq who contract-owner))
