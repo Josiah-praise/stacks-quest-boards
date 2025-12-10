@@ -32,6 +32,8 @@
   (if (is-owner who) true err-not-owner))
 (define-private (assert-minter (who principal))
   (if (is-minter who) true err-not-minter))
+(define-private (assert-valid-recipient (who principal))
+  (if (is-eq who 'SP000000000000000000002Q6VF78) err-invalid-recipient true))
 (define-private (ensure-uri (uri (string-utf8 256)))
   (if (> (len uri) u0) true err-uri-required))
 (define-private (next-token-id)
