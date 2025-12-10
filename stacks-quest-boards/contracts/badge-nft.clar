@@ -89,7 +89,9 @@
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
-    (ok (var-set contract-admin new-admin))))
+    (var-set contract-admin new-admin)
+    (print { event: "set-admin", admin: new-admin })
+    (ok true)))
 
 ;; admin: update base URI
 (define-public (set-base-uri (uri (string-utf8 256)))
