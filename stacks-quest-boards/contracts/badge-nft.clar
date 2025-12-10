@@ -81,3 +81,7 @@
 ;; read: base uri
 (define-read-only (get-base-uri)
   (ok (var-get base-uri)))
+
+;; read: max supply
+(define-read-only (get-max-supply)
+  (ok (var-get max-supply)))
