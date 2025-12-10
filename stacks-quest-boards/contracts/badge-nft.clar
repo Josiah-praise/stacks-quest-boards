@@ -160,9 +160,16 @@
 (define-public (set-token-uri (id uint) (uri (string-utf8 256)))
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
+    (asserts! (not (var-get metadata-locked)) err-metadata-locked)
     (asserts! (ensure-uri uri) err-uri-required)
     (asserts! (token-exists id) err-token-not-found)
     (ok (set-uri! id uri))))
+
+;; admin: lock metadata updates permanently
+(define-public (lock-metadata)
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (ok (var-set metadata-locked true))))
 
 ;; public: transfer token
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
