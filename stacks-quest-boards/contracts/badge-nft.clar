@@ -16,6 +16,7 @@
 (define-constant err-max-supply-too-low (err u107))
 (define-constant err-mint-paused (err u108))
 (define-constant err-invalid-recipient (err u109))
+(define-constant err-metadata-locked (err u110))
 (define-constant contract-owner tx-sender)
 (define-data-var authorized-minter principal contract-owner)
 (define-data-var base-uri (optional (string-utf8 256)) none)
