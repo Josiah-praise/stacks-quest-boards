@@ -47,6 +47,7 @@
 (define-private (record-mint (recipient principal) (token-id uint) (uri (string-utf8 256)))
   (begin
     (enforce-supply-limit)
+    (asserts! (not (is-some (nft-get-owner? badge token-id))) err-token-exists)
     (let ((mint-result (nft-mint? badge token-id recipient)))
       (if (is-ok mint-result)
         (begin
