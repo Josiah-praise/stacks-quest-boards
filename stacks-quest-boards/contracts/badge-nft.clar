@@ -29,6 +29,8 @@
 (define-data-var mint-paused bool false)
 (define-data-var metadata-locked bool false)
 (define-data-var burn-enabled bool false)
+(define-data-var collection-name (string-utf8 64) "Quest Badge")
+(define-data-var collection-symbol (string-utf8 32) "QBADGE")
 (define-map token-uri { id: uint } { uri: (string-utf8 256) })
 (define-map token-minter { id: uint } { minter: principal })
 (define-private (is-owner (who principal))
