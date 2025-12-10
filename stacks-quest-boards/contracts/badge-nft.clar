@@ -77,3 +77,7 @@
 ;; read: current minter
 (define-read-only (get-minter)
   (ok (var-get authorized-minter)))
+
+;; read: base uri
+(define-read-only (get-base-uri)
+  (ok (var-get base-uri)))
