@@ -25,3 +25,5 @@
   (is-eq who contract-owner))
 (define-private (is-minter (who principal))
   (is-eq who (var-get authorized-minter)))
+(define-private (assert-owner (who principal))
+  (if (is-owner who) true err-not-owner))
