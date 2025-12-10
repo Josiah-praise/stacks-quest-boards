@@ -114,3 +114,11 @@
           (nft-transfer? badge token-id sender recipient)
           err-not-token-owner)
     none err-token-not-found))
+
+;; public: mint new badge (minter only)
+(define-public (mint (recipient principal) (uri (string-utf8 256)))
+  (begin
+    (asserts! (assert-minter tx-sender) err-not-minter)
+    (asserts! (ensure-uri uri) err-uri-required)
+    (let ((new-id (next-token-id)))
+      (record-mint recipient new-id uri))))
