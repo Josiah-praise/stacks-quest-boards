@@ -105,3 +105,12 @@
   (match (nft-get-owner? badge id)
     owner (ok owner)
     none err-token-not-found))
+
+;; public: transfer token
+(define-public (transfer (token-id uint) (sender principal) (recipient principal))
+  (match (nft-get-owner? badge token-id)
+    owner
+      (if (is-eq owner sender)
+          (nft-transfer? badge token-id sender recipient)
+          err-not-token-owner)
+    none err-token-not-found))
