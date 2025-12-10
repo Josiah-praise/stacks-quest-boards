@@ -78,6 +78,12 @@
     (asserts! (>= limit (var-get total-supply)) err-max-supply-too-low)
     (ok (var-set max-supply (some limit)))))
 
+;; admin: remove max supply limit
+(define-public (clear-max-supply)
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (ok (var-set max-supply none))))
+
 ;; admin: clear base uri
 (define-public (clear-base-uri)
   (begin
