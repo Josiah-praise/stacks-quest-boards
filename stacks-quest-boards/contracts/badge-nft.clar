@@ -225,6 +225,15 @@
     (print { event: "set-token-uri", id: id, uri: uri })
     (ok true)))
 
+;; admin: update collection name
+(define-public (set-name (name (string-utf8 64)))
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (asserts! (not (var-get metadata-locked)) err-metadata-locked)
+    (var-set collection-name name)
+    (print { event: "set-name", name: name })
+    (ok true)))
+
 ;; admin: lock metadata updates permanently
 (define-public (lock-metadata)
   (begin
