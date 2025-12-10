@@ -78,6 +78,12 @@
     (asserts! (>= limit (var-get total-supply)) err-max-supply-too-low)
     (ok (var-set max-supply (some limit)))))
 
+;; admin: clear base uri
+(define-public (clear-base-uri)
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (ok (var-set base-uri none))))
+
 ;; read: current minter
 (define-read-only (get-minter)
   (ok (var-get authorized-minter)))
