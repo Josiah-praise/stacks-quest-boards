@@ -154,6 +154,14 @@
     owner (ok owner)
     none err-token-not-found))
 
+;; admin: update token uri
+(define-public (set-token-uri (id uint) (uri (string-utf8 256)))
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (asserts! (ensure-uri uri) err-uri-required)
+    (asserts! (token-exists id) err-token-not-found)
+    (ok (set-uri! id uri))))
+
 ;; public: transfer token
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
   (match (get-owner-or-err token-id)
