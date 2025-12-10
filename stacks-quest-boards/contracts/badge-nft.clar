@@ -20,3 +20,4 @@
 (define-data-var max-supply (optional uint) none)
 (define-data-var last-token-id uint u0)
 (define-data-var total-supply uint u0)
+(define-map token-uri { id: uint } { uri: (string-utf8 256) })
