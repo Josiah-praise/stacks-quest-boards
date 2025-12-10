@@ -118,6 +118,12 @@
 (define-read-only (get-total-supply)
   (ok (var-get total-supply)))
 
+;; read: remaining supply (if capped)
+(define-read-only (get-remaining-supply)
+  (match (var-get max-supply)
+    max (ok (some (- max (var-get total-supply))))
+    none (ok none)))
+
 ;; read: mint pause state
 (define-read-only (is-mint-paused)
   (ok (var-get mint-paused)))
