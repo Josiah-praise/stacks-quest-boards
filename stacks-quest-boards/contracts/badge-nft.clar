@@ -100,6 +100,12 @@
     (asserts! (assert-owner tx-sender) err-not-owner)
     (ok (var-set mint-paused flag))))
 
+;; admin: toggle burn ability
+(define-public (set-burn-enabled (flag bool))
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (ok (var-set burn-enabled flag))))
+
 ;; admin: clear base uri
 (define-public (clear-base-uri)
   (begin
