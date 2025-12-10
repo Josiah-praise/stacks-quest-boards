@@ -164,6 +164,12 @@
     entry (ok (get uri entry))
     none err-token-not-found))
 
+;; read: token minter
+(define-read-only (get-token-minter (id uint))
+  (match (map-get? token-minter { id: id })
+    entry (ok (get minter entry))
+    none err-token-not-found))
+
 ;; read: token owner
 (define-read-only (get-owner (id uint))
   (match (nft-get-owner? badge id)
