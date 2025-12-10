@@ -128,3 +128,7 @@
         (match result
           id (begin (print { event: "mint", id: id, to: recipient, uri: uri }) result)
           err result)))))
+
+;; read: token exists?
+(define-read-only (token-exists (id uint))
+  (ok (is-some (nft-get-owner? badge id))))
