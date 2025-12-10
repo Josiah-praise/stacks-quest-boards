@@ -212,6 +212,10 @@
 (define-read-only (is-metadata-locked)
   (ok (var-get metadata-locked)))
 
+;; read: burn enabled?
+(define-read-only (is-burn-enabled)
+  (ok (var-get burn-enabled)))
+
 ;; read: contract owner
 (define-read-only (get-owner-principal)
   (ok contract-owner))
