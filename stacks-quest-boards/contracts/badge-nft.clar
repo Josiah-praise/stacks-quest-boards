@@ -9,3 +9,4 @@
 (define-constant err-not-owner (err u100))
 (define-constant err-not-minter (err u101))
 (define-constant err-uri-required (err u102))
+(define-constant err-supply-exceeded (err u103))
