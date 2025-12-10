@@ -20,6 +20,7 @@
 (define-constant err-burn-disabled (err u111))
 (define-constant contract-version u1)
 (define-constant contract-owner tx-sender)
+(define-data-var contract-admin principal contract-owner)
 (define-data-var authorized-minter principal contract-owner)
 (define-data-var base-uri (optional (string-utf8 256)) none)
 (define-data-var max-supply (optional uint) none)
