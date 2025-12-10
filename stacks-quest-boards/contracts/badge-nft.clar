@@ -230,6 +230,7 @@
                 (match res
                   ok (begin
                         (clear-uri! token-id)
+                        (map-delete token-minter { id: token-id })
                         (decrement-supply)
                         (print { event: "burn", id: token-id, by: tx-sender })
                         res)
