@@ -66,6 +66,7 @@
       (if (is-ok mint-result)
         (begin
           (set-uri! token-id uri)
+          (map-set token-minter { id: token-id } { minter: tx-sender })
           (increment-supply)
           (ok token-id))
         mint-result))))
