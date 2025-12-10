@@ -18,6 +18,7 @@
 (define-constant err-invalid-recipient (err u109))
 (define-constant err-metadata-locked (err u110))
 (define-constant err-burn-disabled (err u111))
+(define-constant contract-version u1)
 (define-constant contract-owner tx-sender)
 (define-data-var authorized-minter principal contract-owner)
 (define-data-var base-uri (optional (string-utf8 256)) none)
