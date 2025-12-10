@@ -85,3 +85,7 @@
 ;; read: max supply
 (define-read-only (get-max-supply)
   (ok (var-get max-supply)))
+
+;; read: total supply
+(define-read-only (get-total-supply)
+  (ok (var-get total-supply)))
