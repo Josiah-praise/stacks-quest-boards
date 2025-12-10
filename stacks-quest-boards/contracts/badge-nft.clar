@@ -44,3 +44,13 @@
     none true))
 (define-private (set-uri! (id uint) (uri (string-utf8 256)))
   (map-set token-uri { id: id } { uri: uri }))
+(define-private (record-mint (recipient principal) (token-id uint) (uri (string-utf8 256)))
+  (begin
+    (enforce-supply-limit)
+    (let ((mint-result (nft-mint? badge token-id recipient)))
+      (if (is-ok mint-result)
+        (begin
+          (set-uri! token-id uri)
+          (increment-supply)
+          (ok token-id))
+        mint-result))))
