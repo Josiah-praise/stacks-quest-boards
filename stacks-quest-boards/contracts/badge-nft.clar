@@ -111,7 +111,10 @@
   (match (nft-get-owner? badge token-id)
     owner
       (if (is-eq owner sender)
-          (nft-transfer? badge token-id sender recipient)
+          (let ((res (nft-transfer? badge token-id sender recipient)))
+            (match res
+              ok (begin (print { event: "transfer", id: token-id, from: sender, to: recipient }) res)
+              err res))
           err-not-token-owner)
     none err-token-not-found))
 
