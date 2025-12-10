@@ -209,7 +209,9 @@
     (asserts! (not (var-get metadata-locked)) err-metadata-locked)
     (asserts! (ensure-uri uri) err-uri-required)
     (asserts! (token-exists id) err-token-not-found)
-    (ok (set-uri! id uri))))
+    (set-uri! id uri)
+    (print { event: "set-token-uri", id: id, uri: uri })
+    (ok true)))
 
 ;; admin: lock metadata updates permanently
 (define-public (lock-metadata)
