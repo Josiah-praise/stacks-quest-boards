@@ -31,3 +31,8 @@
   (if (is-minter who) true err-not-minter))
 (define-private (ensure-uri (uri (string-utf8 256)))
   (if (> (len uri) u0) true err-uri-required))
+(define-private (next-token-id)
+  (let ((new-id (+ (var-get last-token-id) u1)))
+    (begin
+      (var-set last-token-id new-id)
+      new-id)))
