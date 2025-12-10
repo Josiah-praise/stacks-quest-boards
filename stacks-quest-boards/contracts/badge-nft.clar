@@ -83,6 +83,12 @@
     (asserts! (assert-owner tx-sender) err-not-owner)
     (ok (var-set authorized-minter minter))))
 
+;; admin: transfer admin role
+(define-public (set-admin (new-admin principal))
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (ok (var-set contract-admin new-admin))))
+
 ;; admin: update base URI
 (define-public (set-base-uri (uri (string-utf8 256)))
   (begin
