@@ -60,3 +60,9 @@
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
     (ok (var-set authorized-minter minter))))
+
+;; admin: update base URI
+(define-public (set-base-uri (uri (string-utf8 256)))
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (ok (var-set base-uri (some uri)))))
