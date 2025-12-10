@@ -104,7 +104,9 @@
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
     (asserts! (>= limit (var-get total-supply)) err-max-supply-too-low)
-    (ok (var-set max-supply (some limit)))))
+    (var-set max-supply (some limit))
+    (print { event: "set-max-supply", limit: limit })
+    (ok true)))
 
 ;; admin: remove max supply limit
 (define-public (clear-max-supply)
