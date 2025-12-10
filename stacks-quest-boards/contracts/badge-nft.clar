@@ -115,6 +115,10 @@
 (define-read-only (get-total-supply)
   (ok (var-get total-supply)))
 
+;; read: mint pause state
+(define-read-only (is-mint-paused)
+  (ok (var-get mint-paused)))
+
 ;; read: last token id
 (define-read-only (get-last-token-id)
   (ok (var-get last-token-id)))
