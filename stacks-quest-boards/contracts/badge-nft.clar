@@ -104,6 +104,12 @@
     entry (ok (apply-base-uri (get uri entry)))
     none err-token-not-found))
 
+;; read: raw token uri (without base)
+(define-read-only (get-token-uri-raw (id uint))
+  (match (map-get? token-uri { id: id })
+    entry (ok (get uri entry))
+    none err-token-not-found))
+
 ;; read: token owner
 (define-read-only (get-owner (id uint))
   (match (nft-get-owner? badge id)
