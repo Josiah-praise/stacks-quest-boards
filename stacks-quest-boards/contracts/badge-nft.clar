@@ -226,6 +226,13 @@
           err-burn-disabled)
     err err))
 
+;; read: can mint now?
+(define-read-only (can-mint)
+  (ok (and (not (var-get mint-paused))
+           (match (var-get max-supply)
+             max (< (var-get total-supply) max)
+             none true))))
+
 ;; read: token exists?
 (define-read-only (token-exists (id uint))
   (ok (is-some (nft-get-owner? badge id))))
