@@ -112,7 +112,9 @@
 (define-public (clear-max-supply)
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
-    (ok (var-set max-supply none))))
+    (var-set max-supply none)
+    (print { event: "clear-max-supply" })
+    (ok true)))
 
 ;; admin: pause/unpause minting
 (define-public (set-mint-paused (flag bool))
