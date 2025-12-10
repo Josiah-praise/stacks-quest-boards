@@ -81,7 +81,9 @@
 (define-public (set-minter (minter principal))
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
-    (ok (var-set authorized-minter minter))))
+    (var-set authorized-minter minter)
+    (print { event: "set-minter", minter: minter })
+    (ok true)))
 
 ;; admin: transfer admin role
 (define-public (set-admin (new-admin principal))
