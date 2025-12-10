@@ -215,7 +215,9 @@
 (define-public (lock-metadata)
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
-    (ok (var-set metadata-locked true))))
+    (var-set metadata-locked true)
+    (print { event: "lock-metadata" })
+    (ok true)))
 
 ;; public: transfer token
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
