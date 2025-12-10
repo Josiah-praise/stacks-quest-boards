@@ -152,7 +152,7 @@
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
   (match (get-owner-or-err token-id)
     owner
-      (if (is-eq owner sender)
+      (if (and (is-eq owner sender) (is-eq true (assert-valid-recipient recipient)))
           (let ((res (nft-transfer? badge token-id sender recipient)))
             (match res
               ok (begin (print { event: "transfer", id: token-id, from: sender, to: recipient }) res)
