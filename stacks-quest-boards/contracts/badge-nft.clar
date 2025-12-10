@@ -13,3 +13,4 @@
 (define-constant err-token-exists (err u104))
 (define-constant err-not-token-owner (err u105))
 (define-constant err-token-not-found (err u106))
+(define-constant err-max-supply-too-low (err u107))
