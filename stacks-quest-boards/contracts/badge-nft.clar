@@ -73,3 +73,7 @@
     (asserts! (assert-owner tx-sender) err-not-owner)
     (asserts! (>= limit (var-get total-supply)) err-max-supply-too-low)
     (ok (var-set max-supply (some limit)))))
+
+;; read: current minter
+(define-read-only (get-minter)
+  (ok (var-get authorized-minter)))
