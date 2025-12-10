@@ -200,6 +200,10 @@
 (define-read-only (token-exists (id uint))
   (ok (is-some (nft-get-owner? badge id))))
 
+;; read: metadata lock status
+(define-read-only (is-metadata-locked)
+  (ok (var-get metadata-locked)))
+
 ;; read: contract owner
 (define-read-only (get-owner-principal)
   (ok contract-owner))
