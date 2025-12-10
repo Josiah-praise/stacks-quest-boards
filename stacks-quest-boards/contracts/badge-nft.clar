@@ -196,6 +196,18 @@
     entry (ok (get minter entry))
     none err-token-not-found))
 
+;; read: bundled token info
+(define-read-only (get-token-info (id uint))
+  (match (get-owner-or-err id)
+    owner
+      (match (get-token-uri-raw id)
+        uri
+          (match (map-get? token-minter { id: id })
+            entry (ok { owner: owner, uri: uri, minter: (get minter entry) })
+            none err-token-not-found)
+        err err))
+    err err))
+
 ;; read: collection name
 (define-read-only (get-name)
   (ok (var-get collection-name)))
