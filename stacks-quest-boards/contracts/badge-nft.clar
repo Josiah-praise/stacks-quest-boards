@@ -36,3 +36,5 @@
     (begin
       (var-set last-token-id new-id)
       new-id)))
+(define-private (increment-supply)
+  (var-set total-supply (+ (var-get total-supply) u1)))
