@@ -54,3 +54,9 @@
           (increment-supply)
           (ok token-id))
         mint-result))))
+
+;; admin: update authorized minter
+(define-public (set-minter (minter principal))
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (ok (var-set authorized-minter minter))))
