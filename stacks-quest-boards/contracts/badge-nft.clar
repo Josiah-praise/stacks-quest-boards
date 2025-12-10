@@ -4,3 +4,6 @@
 
 ;; token definition
 (define-non-fungible-token badge uint)
+
+;; constants
+(define-constant err-not-owner (err u100))
