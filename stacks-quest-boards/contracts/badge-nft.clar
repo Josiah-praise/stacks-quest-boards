@@ -87,6 +87,12 @@
     (asserts! (assert-owner tx-sender) err-not-owner)
     (ok (var-set max-supply none))))
 
+;; admin: pause/unpause minting
+(define-public (set-mint-paused (flag bool))
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (ok (var-set mint-paused flag))))
+
 ;; admin: clear base uri
 (define-public (clear-base-uri)
   (begin
