@@ -134,7 +134,7 @@
 
 ;; public: transfer token
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
-  (match (nft-get-owner? badge token-id)
+  (match (get-owner-or-err token-id)
     owner
       (if (is-eq owner sender)
           (let ((res (nft-transfer? badge token-id sender recipient)))
@@ -142,7 +142,7 @@
               ok (begin (print { event: "transfer", id: token-id, from: sender, to: recipient }) res)
               err res))
           err-not-token-owner)
-    none err-token-not-found))
+    err err))
 
 ;; public: mint new badge (minter only)
 (define-public (mint (recipient principal) (uri (string-utf8 256)))
