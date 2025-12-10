@@ -95,7 +95,9 @@
 (define-public (set-base-uri (uri (string-utf8 256)))
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
-    (ok (var-set base-uri (some uri)))))
+    (var-set base-uri (some uri))
+    (print { event: "set-base-uri", uri: uri })
+    (ok true)))
 
 ;; admin: set max supply (cannot be below current supply)
 (define-public (set-max-supply (limit uint))
