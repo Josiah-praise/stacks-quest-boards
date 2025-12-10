@@ -262,3 +262,7 @@
 ;; read: contract owner
 (define-read-only (get-owner-principal)
   (ok contract-owner))
+
+;; read: contract version
+(define-read-only (get-version)
+  (ok contract-version))
