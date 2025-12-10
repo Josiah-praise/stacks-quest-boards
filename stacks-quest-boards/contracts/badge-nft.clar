@@ -11,3 +11,5 @@
 (define-constant err-uri-required (err u102))
 (define-constant err-supply-exceeded (err u103))
 (define-constant err-token-exists (err u104))
+(define-constant err-not-token-owner (err u105))
+(define-constant err-token-not-found (err u106))
