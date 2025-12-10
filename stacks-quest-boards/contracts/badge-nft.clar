@@ -54,6 +54,10 @@
           (increment-supply)
           (ok token-id))
         mint-result))))
+(define-private (apply-base-uri (uri (string-utf8 256)))
+  (match (var-get base-uri)
+    base (concat base uri)
+    none uri))
 
 ;; admin: update authorized minter
 (define-public (set-minter (minter principal))
