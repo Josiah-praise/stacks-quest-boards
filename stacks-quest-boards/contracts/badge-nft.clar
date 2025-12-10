@@ -47,6 +47,8 @@
       new-id)))
 (define-private (increment-supply)
   (var-set total-supply (+ (var-get total-supply) u1)))
+(define-private (decrement-supply)
+  (var-set total-supply (- (var-get total-supply) u1)))
 (define-private (enforce-supply-limit)
   (match (var-get max-supply)
     max (if (<= (+ (var-get total-supply) u1) max) true err-supply-exceeded)
