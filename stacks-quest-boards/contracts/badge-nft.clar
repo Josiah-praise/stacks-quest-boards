@@ -165,6 +165,7 @@
   (begin
     (asserts! (assert-minter tx-sender) err-not-minter)
     (asserts! (not (var-get mint-paused)) err-mint-paused)
+    (asserts! (assert-valid-recipient recipient) err-invalid-recipient)
     (asserts! (ensure-uri uri) err-uri-required)
     (let ((new-id (next-token-id)))
       (let ((result (record-mint recipient new-id uri)))
