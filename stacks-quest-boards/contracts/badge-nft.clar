@@ -128,7 +128,9 @@
 (define-public (clear-base-uri)
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
-    (ok (var-set base-uri none))))
+    (var-set base-uri none)
+    (print { event: "clear-base-uri" })
+    (ok true)))
 
 ;; read: current minter
 (define-read-only (get-minter)
