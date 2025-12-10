@@ -89,3 +89,7 @@
 ;; read: total supply
 (define-read-only (get-total-supply)
   (ok (var-get total-supply)))
+
+;; read: last token id
+(define-read-only (get-last-token-id)
+  (ok (var-get last-token-id)))
