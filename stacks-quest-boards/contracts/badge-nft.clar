@@ -128,7 +128,9 @@
 (define-public (set-burn-enabled (flag bool))
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
-    (ok (var-set burn-enabled flag))))
+    (var-set burn-enabled flag)
+    (print { event: "set-burn-enabled", enabled: flag })
+    (ok true)))
 
 ;; admin: clear base uri
 (define-public (clear-base-uri)
