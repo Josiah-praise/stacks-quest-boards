@@ -120,7 +120,9 @@
 (define-public (set-mint-paused (flag bool))
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
-    (ok (var-set mint-paused flag))))
+    (var-set mint-paused flag)
+    (print { event: "set-mint-paused", paused: flag })
+    (ok true)))
 
 ;; admin: toggle burn ability
 (define-public (set-burn-enabled (flag bool))
