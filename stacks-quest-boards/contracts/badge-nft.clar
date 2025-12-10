@@ -234,6 +234,15 @@
     (print { event: "set-name", name: name })
     (ok true)))
 
+;; admin: update collection symbol
+(define-public (set-symbol (symbol (string-utf8 32)))
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (asserts! (not (var-get metadata-locked)) err-metadata-locked)
+    (var-set collection-symbol symbol)
+    (print { event: "set-symbol", symbol: symbol })
+    (ok true)))
+
 ;; admin: lock metadata updates permanently
 (define-public (lock-metadata)
   (begin
