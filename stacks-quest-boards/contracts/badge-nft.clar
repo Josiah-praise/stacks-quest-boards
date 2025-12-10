@@ -146,6 +146,10 @@
 (define-read-only (get-last-token-id)
   (ok (var-get last-token-id)))
 
+;; read: next token id
+(define-read-only (get-next-token-id)
+  (ok (+ (var-get last-token-id) u1)))
+
 ;; read: token uri
 (define-read-only (get-token-uri (id uint))
   (match (map-get? token-uri { id: id })
