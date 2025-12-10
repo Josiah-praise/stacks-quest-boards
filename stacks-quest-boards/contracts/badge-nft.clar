@@ -7,3 +7,4 @@
 
 ;; constants
 (define-constant err-not-owner (err u100))
+(define-constant err-not-minter (err u101))
