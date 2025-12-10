@@ -121,4 +121,7 @@
     (asserts! (assert-minter tx-sender) err-not-minter)
     (asserts! (ensure-uri uri) err-uri-required)
     (let ((new-id (next-token-id)))
-      (record-mint recipient new-id uri))))
+      (let ((result (record-mint recipient new-id uri)))
+        (match result
+          id (begin (print { event: "mint", id: id, to: recipient, uri: uri }) result)
+          err result)))))
