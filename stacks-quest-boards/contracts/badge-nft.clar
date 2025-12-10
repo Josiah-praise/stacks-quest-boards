@@ -99,3 +99,9 @@
   (match (map-get? token-uri { id: id })
     entry (ok (get uri entry))
     none err-token-not-found))
+
+;; read: token owner
+(define-read-only (get-owner (id uint))
+  (match (nft-get-owner? badge id)
+    owner (ok owner)
+    none err-token-not-found))
