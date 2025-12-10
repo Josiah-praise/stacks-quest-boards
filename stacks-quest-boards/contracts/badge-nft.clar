@@ -196,6 +196,14 @@
     entry (ok (get minter entry))
     none err-token-not-found))
 
+;; read: collection name
+(define-read-only (get-name)
+  (ok (var-get collection-name)))
+
+;; read: collection symbol
+(define-read-only (get-symbol)
+  (ok (var-get collection-symbol)))
+
 ;; read: token owner
 (define-read-only (get-owner (id uint))
   (match (nft-get-owner? badge id)
