@@ -66,3 +66,10 @@
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
     (ok (var-set base-uri (some uri)))))
+
+;; admin: set max supply (cannot be below current supply)
+(define-public (set-max-supply (limit uint))
+  (begin
+    (asserts! (assert-owner tx-sender) err-not-owner)
+    (asserts! (>= limit (var-get total-supply)) err-max-supply-too-low)
+    (ok (var-set max-supply (some limit)))))
