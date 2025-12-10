@@ -42,3 +42,5 @@
   (match (var-get max-supply)
     max (if (<= (+ (var-get total-supply) u1) max) true err-supply-exceeded)
     none true))
+(define-private (set-uri! (id uint) (uri (string-utf8 256)))
+  (map-set token-uri { id: id } { uri: uri }))
