@@ -55,6 +55,8 @@
     none true))
 (define-private (set-uri! (id uint) (uri (string-utf8 256)))
   (map-set token-uri { id: id } { uri: uri }))
+(define-private (clear-uri! (id uint))
+  (map-delete token-uri { id: id }))
 (define-private (record-mint (recipient principal) (token-id uint) (uri (string-utf8 256)))
   (begin
     (enforce-supply-limit)
