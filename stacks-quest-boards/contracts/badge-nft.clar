@@ -29,8 +29,8 @@
 (define-data-var mint-paused bool false)
 (define-data-var metadata-locked bool false)
 (define-data-var burn-enabled bool false)
-(define-data-var collection-name (string-utf8 64) "Quest Badge")
-(define-data-var collection-symbol (string-utf8 32) "QBADGE")
+(define-data-var collection-name (string-utf8 64) u"Quest Badge")
+(define-data-var collection-symbol (string-utf8 32) u"QBADGE")
 (define-map token-uri { id: uint } { uri: (string-utf8 256) })
 (define-map token-minter { id: uint } { minter: principal })
 (define-private (is-owner (who principal))
@@ -38,13 +38,13 @@
 (define-private (is-minter (who principal))
   (is-eq who (var-get authorized-minter)))
 (define-private (assert-owner (who principal))
-  (if (is-owner who) true err-not-owner))
+  (is-owner who))
 (define-private (assert-minter (who principal))
-  (if (is-minter who) true err-not-minter))
+  (is-minter who))
 (define-private (assert-valid-recipient (who principal))
-  (if (is-eq who 'SP000000000000000000002Q6VF78) err-invalid-recipient true))
+  (not (is-eq who 'SP000000000000000000002Q6VF78)))
 (define-private (ensure-uri (uri (string-utf8 256)))
-  (if (> (len uri) u0) true err-uri-required))
+  (> (len uri) u0))
 (define-private (next-token-id)
   (let ((new-id (+ (var-get last-token-id) u1)))
     (begin
@@ -56,33 +56,34 @@
   (var-set total-supply (- (var-get total-supply) u1)))
 (define-private (enforce-supply-limit)
   (match (var-get max-supply)
-    max (if (<= (+ (var-get total-supply) u1) max) true err-supply-exceeded)
-    none true))
+    max (<= (+ (var-get total-supply) u1) max)
+    true))
 (define-private (set-uri! (id uint) (uri (string-utf8 256)))
   (map-set token-uri { id: id } { uri: uri }))
 (define-private (clear-uri! (id uint))
   (map-delete token-uri { id: id }))
 (define-private (record-mint (recipient principal) (token-id uint) (uri (string-utf8 256)))
   (begin
-    (enforce-supply-limit)
+    (asserts! (enforce-supply-limit) err-supply-exceeded)
     (asserts! (not (is-some (nft-get-owner? badge token-id))) err-token-exists)
-    (let ((mint-result (nft-mint? badge token-id recipient)))
-      (if (is-ok mint-result)
+    (match (nft-mint? badge token-id recipient)
+      minted
         (begin
           (set-uri! token-id uri)
           (map-set token-minter { id: token-id } { minter: tx-sender })
           (increment-supply)
           (ok token-id))
-        mint-result))))
+      mint-err (err mint-err))))
 (define-private (apply-base-uri (uri (string-utf8 256)))
   (match (var-get base-uri)
     base (concat base uri)
-    none uri))
+    uri))
 
 ;; admin: update authorized minter
 (define-public (set-minter (minter principal))
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
+    (asserts! (assert-valid-recipient minter) err-invalid-recipient)
     (var-set authorized-minter minter)
     (print { event: "set-minter", minter: minter })
     (ok true)))
@@ -91,6 +92,7 @@
 (define-public (set-admin (new-admin principal))
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
+    (asserts! (assert-valid-recipient new-admin) err-invalid-recipient)
     (var-set contract-admin new-admin)
     (print { event: "set-admin", admin: new-admin })
     (ok true)))
@@ -99,6 +101,7 @@
 (define-public (set-base-uri (uri (string-utf8 256)))
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
+    (asserts! (ensure-uri uri) err-uri-required)
     (var-set base-uri (some uri))
     (print { event: "set-base-uri", uri: uri })
     (ok true)))
@@ -164,7 +167,7 @@
 (define-read-only (get-remaining-supply)
   (match (var-get max-supply)
     max (ok (some (- max (var-get total-supply))))
-    none (ok none)))
+    (ok none)))
 
 ;; read: mint pause state
 (define-read-only (is-mint-paused)
@@ -182,19 +185,22 @@
 (define-read-only (get-token-uri (id uint))
   (match (map-get? token-uri { id: id })
     entry (ok (apply-base-uri (get uri entry)))
-    none err-token-not-found))
+    err-token-not-found))
 
 ;; read: raw token uri (without base)
 (define-read-only (get-token-uri-raw (id uint))
   (match (map-get? token-uri { id: id })
     entry (ok (get uri entry))
-    none err-token-not-found))
+    err-token-not-found))
 
 ;; read: token minter
 (define-read-only (get-token-minter (id uint))
+  (get-token-minter-or-err id))
+
+(define-private (get-token-minter-or-err (id uint))
   (match (map-get? token-minter { id: id })
     entry (ok (get minter entry))
-    none err-token-not-found))
+    err-token-not-found))
 
 ;; read: bundled token info
 (define-read-only (get-token-info (id uint))
@@ -202,11 +208,11 @@
     owner
       (match (get-token-uri-raw id)
         uri
-          (match (map-get? token-minter { id: id })
-            entry (ok { owner: owner, uri: uri, minter: (get minter entry) })
-            none err-token-not-found)
-        err err))
-    err err))
+          (match (get-token-minter-or-err id)
+            minter (ok { owner: owner, uri: uri, minter: minter })
+            err (err err))
+        err (err err))
+    err (err err)))
 
 ;; read: collection name
 (define-read-only (get-name)
@@ -220,11 +226,13 @@
 (define-read-only (get-owner (id uint))
   (match (nft-get-owner? badge id)
     owner (ok owner)
-    none err-token-not-found))
+    err-token-not-found))
+(define-private (token-exists? (id uint))
+  (is-some (nft-get-owner? badge id)))
 (define-private (get-owner-or-err (id uint))
   (match (nft-get-owner? badge id)
     owner (ok owner)
-    none err-token-not-found))
+    err-token-not-found))
 
 ;; admin: update token uri
 (define-public (set-token-uri (id uint) (uri (string-utf8 256)))
@@ -232,7 +240,7 @@
     (asserts! (assert-owner tx-sender) err-not-owner)
     (asserts! (not (var-get metadata-locked)) err-metadata-locked)
     (asserts! (ensure-uri uri) err-uri-required)
-    (asserts! (token-exists id) err-token-not-found)
+    (asserts! (token-exists? id) err-token-not-found)
     (set-uri! id uri)
     (print { event: "set-token-uri", id: id, uri: uri })
     (ok true)))
@@ -242,6 +250,7 @@
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
     (asserts! (not (var-get metadata-locked)) err-metadata-locked)
+    (asserts! (> (len name) u0) err-uri-required)
     (var-set collection-name name)
     (print { event: "set-name", name: name })
     (ok true)))
@@ -251,6 +260,7 @@
   (begin
     (asserts! (assert-owner tx-sender) err-not-owner)
     (asserts! (not (var-get metadata-locked)) err-metadata-locked)
+    (asserts! (> (len symbol) u0) err-uri-required)
     (var-set collection-symbol symbol)
     (print { event: "set-symbol", symbol: symbol })
     (ok true)))
@@ -265,15 +275,13 @@
 
 ;; public: transfer token
 (define-public (transfer (token-id uint) (sender principal) (recipient principal))
-  (match (get-owner-or-err token-id)
-    owner
-      (if (and (is-eq owner sender) (is-eq true (assert-valid-recipient recipient)))
-          (let ((res (nft-transfer? badge token-id sender recipient)))
-            (match res
-              ok (begin (print { event: "transfer", id: token-id, from: sender, to: recipient }) res)
-              err res))
-          err-not-token-owner)
-    err err))
+  (let ((owner (unwrap! (get-owner-or-err token-id) err-token-not-found)))
+    (asserts! (is-eq owner sender) err-not-token-owner)
+    (asserts! (assert-valid-recipient recipient) err-invalid-recipient)
+    (let ((res (nft-transfer? badge token-id sender recipient)))
+      (match res
+        ok (begin (print { event: "transfer", id: token-id, from: sender, to: recipient }) res)
+        err res))))
 
 ;; public: mint new badge (minter only)
 (define-public (mint (recipient principal) (uri (string-utf8 256)))
@@ -290,33 +298,29 @@
 
 ;; public: burn token (owner only, if enabled)
 (define-public (burn (token-id uint))
-  (match (get-owner-or-err token-id)
-    owner
-      (if (is-eq true (var-get burn-enabled))
-          (if (is-eq owner tx-sender)
-              (let ((res (nft-burn? badge token-id owner)))
-                (match res
-                  ok (begin
-                        (clear-uri! token-id)
-                        (map-delete token-minter { id: token-id })
-                        (decrement-supply)
-                        (print { event: "burn", id: token-id, by: tx-sender })
-                        res)
-                  err res))
-              err-not-token-owner)
-          err-burn-disabled)
-    err err))
+  (let ((owner (unwrap! (get-owner-or-err token-id) err-token-not-found)))
+    (asserts! (is-eq true (var-get burn-enabled)) err-burn-disabled)
+    (asserts! (is-eq owner tx-sender) err-not-token-owner)
+    (let ((res (nft-burn? badge token-id owner)))
+      (match res
+        ok (begin
+              (clear-uri! token-id)
+              (map-delete token-minter { id: token-id })
+              (decrement-supply)
+              (print { event: "burn", id: token-id, by: tx-sender })
+              res)
+        err res))))
 
 ;; read: can mint now?
 (define-read-only (can-mint)
   (ok (and (not (var-get mint-paused))
            (match (var-get max-supply)
              max (< (var-get total-supply) max)
-             none true))))
+             true))))
 
 ;; read: token exists?
 (define-read-only (token-exists (id uint))
-  (ok (is-some (nft-get-owner? badge id))))
+  (ok (token-exists? id)))
 
 ;; read: metadata lock status
 (define-read-only (is-metadata-locked)

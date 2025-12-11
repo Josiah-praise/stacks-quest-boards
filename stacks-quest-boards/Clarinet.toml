@@ -7,35 +7,37 @@ cache_dir = './.cache'
 requirements = []
 [contracts.badge-nft]
 path = 'contracts/badge-nft.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.math-helpers]
 path = 'contracts/math-helpers.clar'
-clarity_version = 3
+clarity_version = 4
 epoch = 'latest'
 
 [contracts.quest-progress]
 path = 'contracts/quest-progress.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.quest-registry]
 path = 'contracts/quest-registry.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.quest-types]
 path = 'contracts/quest-types.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.xp-ledger]
 path = 'contracts/xp-ledger.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 [repl.analysis]
 passes = ['check_checker']
+
+[repl.analysis.lints]
 
 [repl.analysis.check_checker]
 strict = false
