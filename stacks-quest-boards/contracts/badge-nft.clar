@@ -33,6 +33,7 @@
 (define-data-var collection-symbol (string-utf8 32) u"QBADGE")
 (define-map token-uri { id: uint } { uri: (string-utf8 256) })
 (define-map token-minter { id: uint } { minter: principal })
+(define-map token-minted-at { id: uint } { minted-at: uint })
 (define-private (is-owner (who principal))
   (is-eq who (var-get contract-admin)))
 (define-private (is-minter (who principal))
@@ -71,6 +72,7 @@
         (begin
           (set-uri! token-id uri)
           (map-set token-minter { id: token-id } { minter: tx-sender })
+          (map-set token-minted-at { id: token-id } { minted-at: stacks-block-time })
           (increment-supply)
           (ok token-id))
       mint-err (err mint-err))))
@@ -197,6 +199,14 @@
 (define-read-only (get-token-minter (id uint))
   (get-token-minter-or-err id))
 
+(define-private (get-token-minted-at-or-err (id uint))
+  (match (map-get? token-minted-at { id: id })
+    entry (ok (get minted-at entry))
+    err-token-not-found))
+
+(define-read-only (get-token-minted-at (id uint))
+  (get-token-minted-at-or-err id))
+
 (define-private (get-token-minter-or-err (id uint))
   (match (map-get? token-minter { id: id })
     entry (ok (get minter entry))
@@ -209,7 +219,10 @@
       (match (get-token-uri-raw id)
         uri
           (match (get-token-minter-or-err id)
-            minter (ok { owner: owner, uri: uri, minter: minter })
+            minter
+              (match (get-token-minted-at-or-err id)
+                minted-at (ok { owner: owner, uri: uri, minter: minter, minted-at: minted-at })
+                err (err err))
             err (err err))
         err (err err))
     err (err err)))
@@ -306,6 +319,7 @@
         ok (begin
               (clear-uri! token-id)
               (map-delete token-minter { id: token-id })
+              (map-delete token-minted-at { id: token-id })
               (decrement-supply)
               (print { event: "burn", id: token-id, by: tx-sender })
               res)
