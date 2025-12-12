@@ -291,3 +291,50 @@ Burns (destroys) a badge NFT. Only the token owner can burn their token, and bur
 
 **Event:** `{ event: "burn", id: token-id, by: tx-sender }`
 
+---
+
+## Read-Only Functions
+
+### Contract Information
+- **`get-name`**: Returns the collection name (default: "Quest Badge")
+- **`get-symbol`**: Returns the collection symbol (default: "QBADGE")
+- **`get-version`**: Returns the contract version (`u1`)
+- **`get-owner-principal`**: Returns the current admin principal
+
+### Supply and Minting
+- **`get-total-supply`**: Returns the current total number of minted tokens
+- **`get-max-supply`**: Returns the maximum supply limit (if set) or `none`
+- **`get-remaining-supply`**: Returns remaining supply if max supply is set, or `none` if unlimited
+- **`get-last-token-id`**: Returns the ID of the most recently minted token
+- **`get-next-token-id`**: Returns what the next token ID will be (`last-token-id + 1`)
+- **`is-mint-paused`**: Returns `true` if minting is paused, `false` otherwise
+- **`can-mint`**: Returns `true` if minting is currently allowed (not paused and within supply limit)
+
+### Roles
+- **`get-minter`**: Returns the current authorized minter principal
+
+### Token Information
+- **`get-owner (id uint)`**: Returns the owner principal of the specified token, or error if token doesn't exist
+- **`token-exists (id uint)`**: Returns `true` if token exists, `false` otherwise
+- **`get-token-uri (id uint)`**: Returns the full token URI (base-uri + token-uri if base-uri is set), or error if token doesn't exist
+- **`get-token-uri-raw (id uint)`**: Returns the raw token URI (without base-uri prefix), or error if token doesn't exist
+- **`get-token-minter (id uint)`**: Returns the principal that minted the token, or error if token doesn't exist
+- **`get-token-minted-at (id uint)`**: Returns the block time when the token was minted (Clarity 4 feature using `stacks-block-time`), or error if token doesn't exist
+
+### Comprehensive Token Info
+- **`get-token-info (id uint)`**: Returns a bundled response with all token information:
+  ```clarity
+  {
+    owner: principal,
+    uri: (string-utf8 256),
+    minter: principal,
+    minted-at: uint
+  }
+  ```
+  Returns error if token doesn't exist.
+
+### Settings
+- **`get-base-uri`**: Returns the base URI (if set) or `none`
+- **`is-metadata-locked`**: Returns `true` if metadata is permanently locked, `false` otherwise
+- **`is-burn-enabled`**: Returns `true` if burning is enabled, `false` otherwise
+
