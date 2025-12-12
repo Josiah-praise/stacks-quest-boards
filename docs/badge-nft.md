@@ -66,3 +66,164 @@ The `badge-nft` contract is a SIP-009 compliant non-fungible token (NFT) impleme
 - `token-minter`: Maps token ID to the principal that minted it
 - `token-minted-at`: Maps token ID to the block time when it was minted (Clarity 4 feature)
 
+---
+
+## Admin Functions
+
+All admin functions require the caller to be the contract admin (`contract-admin`). All functions emit events via `print` statements.
+
+### `set-minter`
+**Signature:** `(define-public (set-minter (minter principal)))`
+
+Updates the authorized minter address. The new minter cannot be the invalid recipient address.
+
+**Preconditions:**
+- Caller must be admin
+- `minter` must be a valid recipient (not `SP000000000000000000002Q6VF78`)
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "set-minter", minter: minter }`
+
+### `set-admin`
+**Signature:** `(define-public (set-admin (new-admin principal)))`
+
+Transfers the admin role to a new principal. This is a critical function that permanently changes contract control.
+
+**Preconditions:**
+- Caller must be admin
+- `new-admin` must be a valid recipient (not `SP000000000000000000002Q6VF78`)
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "set-admin", admin: new-admin }`
+
+### `set-base-uri`
+**Signature:** `(define-public (set-base-uri (uri (string-utf8 256))))`
+
+Sets a base URI prefix that will be prepended to all token URIs. If set, `get-token-uri` will return `base-uri + token-uri`.
+
+**Preconditions:**
+- Caller must be admin
+- `uri` must be non-empty
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "set-base-uri", uri: uri }`
+
+### `clear-base-uri`
+**Signature:** `(define-public (clear-base-uri))`
+
+Removes the base URI, causing tokens to use only their individual URIs.
+
+**Preconditions:**
+- Caller must be admin
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "clear-base-uri" }`
+
+### `set-max-supply`
+**Signature:** `(define-public (set-max-supply (limit uint)))`
+
+Sets a maximum supply limit for tokens. Cannot be set below the current total supply.
+
+**Preconditions:**
+- Caller must be admin
+- `limit` must be >= current `total-supply`
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "set-max-supply", limit: limit }`
+
+### `clear-max-supply`
+**Signature:** `(define-public (clear-max-supply))`
+
+Removes the maximum supply limit, allowing unlimited minting.
+
+**Preconditions:**
+- Caller must be admin
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "clear-max-supply" }`
+
+### `set-mint-paused`
+**Signature:** `(define-public (set-mint-paused (flag bool)))`
+
+Pauses or unpauses minting. When paused, `mint` function will fail with `err-mint-paused`.
+
+**Preconditions:**
+- Caller must be admin
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "set-mint-paused", paused: flag }`
+
+### `set-burn-enabled`
+**Signature:** `(define-public (set-burn-enabled (flag bool)))`
+
+Enables or disables token burning. When disabled, `burn` function will fail with `err-burn-disabled`.
+
+**Preconditions:**
+- Caller must be admin
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "set-burn-enabled", enabled: flag }`
+
+### `set-name`
+**Signature:** `(define-public (set-name (name (string-utf8 64))))`
+
+Updates the collection name. Requires metadata to be unlocked.
+
+**Preconditions:**
+- Caller must be admin
+- Metadata must not be locked
+- `name` must be non-empty
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "set-name", name: name }`
+
+### `set-symbol`
+**Signature:** `(define-public (set-symbol (symbol (string-utf8 32))))`
+
+Updates the collection symbol. Requires metadata to be unlocked.
+
+**Preconditions:**
+- Caller must be admin
+- Metadata must not be locked
+- `symbol` must be non-empty
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "set-symbol", symbol: symbol }`
+
+### `set-token-uri`
+**Signature:** `(define-public (set-token-uri (id uint) (uri (string-utf8 256))))`
+
+Updates the URI for a specific token. Requires metadata to be unlocked and token to exist.
+
+**Preconditions:**
+- Caller must be admin
+- Metadata must not be locked
+- Token with `id` must exist
+- `uri` must be non-empty
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "set-token-uri", id: id, uri: uri }`
+
+### `lock-metadata`
+**Signature:** `(define-public (lock-metadata))`
+
+Permanently locks all metadata updates. Once locked, `set-name`, `set-symbol`, and `set-token-uri` will fail. This action is irreversible.
+
+**Preconditions:**
+- Caller must be admin
+
+**Returns:** `(ok true)` on success
+
+**Event:** `{ event: "lock-metadata" }`
+
