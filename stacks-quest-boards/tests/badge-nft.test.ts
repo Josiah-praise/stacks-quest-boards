@@ -90,42 +90,60 @@ describe("badge-nft", () => {
     // Verify minting was rejected with err-mint-paused error code
     expect(mintResult.result).toBeErr(Cl.uint(108)); // err-mint-paused
   });
-it("requires burn toggle and ownership, and clears metadata on burn", ()
-=> {
-const mintResult = mintBadge(alice, "ipfs://badge-burn");
-expect(mintResult.result).toBeOk(Cl.uint(1));
-const burnWhileDisabled = simnet.callPublicFn("badge-nft", "burn",
-[Cl.uint(1)], alice);
-expect(burnWhileDisabled.result).toBeErr(Cl.uint(111)); // err-burn-
-disabled
-const enableBurn = simnet.callPublicFn(
-"badge-nft",
-"set-burn-enabled",
-[Cl.bool(true)],
-deployer,
-);
-expect(enableBurn.result).toBeOk(Cl.bool(true));
-const burnByNonOwner = simnet.callPublicFn("badge-nft", "burn",[Cl.uint(1)], bob);
-expect(burnByNonOwner.result).toBeErr(Cl.uint(105)); // err-not-token-
-owner
-const burnResult = simnet.callPublicFn("badge-nft", "burn", [Cl.uint(1)],
-alice);
-expect(burnResult.result).toBeOk(Cl.bool(true));
-const tokenInfo = simnet.callReadOnlyFn(
-"badge-nft",
-"get-token-info",
-[Cl.uint(1)],
-alice,
-);
-expect(tokenInfo.result).toBeErr(Cl.uint(106)); // err-token-not-found
-const mintedAt = simnet.callReadOnlyFn(
-"badge-nft",
-"get-token-minted-at",
-[Cl.uint(1)],
-alice,
-);
-expect(mintedAt.result).toBeErr(Cl.uint(106)); // err-token-not-foundconst supply = simnet.callReadOnlyFn("badge-nft", "get-total-supply", [],
-alice);
-expect(supply.result).toBeOk(Cl.uint(0));
-});
+  // Test: Verify burn functionality with access control and metadata cleanup
+  // This test ensures burn requires ownership, burn must be enabled, and all metadata is cleaned up
+  it("requires burn toggle and ownership, and clears metadata on burn", () => {
+    // First, mint a badge to alice for testing burn functionality
+    const mintResult = mintBadge(alice, "ipfs://badge-burn");
+    expect(mintResult.result).toBeOk(Cl.uint(1));
+    
+    // Attempt to burn while burn is disabled (should fail)
+    const burnWhileDisabled = simnet.callPublicFn("badge-nft", "burn", [Cl.uint(1)], alice);
+    // Verify burn was rejected with err-burn-disabled error code
+    expect(burnWhileDisabled.result).toBeErr(Cl.uint(111)); // err-burn-disabled
+    
+    // Admin enables burning
+    const enableBurn = simnet.callPublicFn(
+      "badge-nft",
+      "set-burn-enabled",
+      [Cl.bool(true)],
+      deployer,
+    );
+    // Verify burn was enabled successfully
+    expect(enableBurn.result).toBeOk(Cl.bool(true));
+    
+    // Attempt to burn by non-owner (bob trying to burn alice's token)
+    const burnByNonOwner = simnet.callPublicFn("badge-nft", "burn", [Cl.uint(1)], bob);
+    // Verify burn was rejected with err-not-token-owner error code
+    expect(burnByNonOwner.result).toBeErr(Cl.uint(105)); // err-not-token-owner
+    
+    // Owner (alice) burns the token
+    const burnResult = simnet.callPublicFn("badge-nft", "burn", [Cl.uint(1)], alice);
+    // Verify burn was successful
+    expect(burnResult.result).toBeOk(Cl.bool(true));
+    
+    // Verify token info is no longer available (token was deleted)
+    const tokenInfo = simnet.callReadOnlyFn(
+      "badge-nft",
+      "get-token-info",
+      [Cl.uint(1)],
+      alice,
+    );
+    // Verify token not found error (token was burned and cleaned up)
+    expect(tokenInfo.result).toBeErr(Cl.uint(106)); // err-token-not-found
+    
+    // Verify minted-at record was also deleted
+    const mintedAt = simnet.callReadOnlyFn(
+      "badge-nft",
+      "get-token-minted-at",
+      [Cl.uint(1)],
+      alice,
+    );
+    // Verify minted-at record not found (cleaned up during burn)
+    expect(mintedAt.result).toBeErr(Cl.uint(106)); // err-token-not-found
+    
+    // Verify total supply was decremented back to 0
+    const supply = simnet.callReadOnlyFn("badge-nft", "get-total-supply", [], alice);
+    expect(supply.result).toBeOk(Cl.uint(0));
+  });
 });
