@@ -401,3 +401,95 @@ The contract prevents transfers and mints to the address `SP00000000000000000000
 - When paused, all `mint` calls will fail with `err-mint-paused`
 - Use `can-mint` read-only function to check if minting is currently allowed
 
+---
+
+## Testing and Usage Guidance
+
+### Basic Usage Flow
+
+1. **Setup (Admin)**
+   ```clarity
+   ;; Set minter
+   (set-minter minter-address)
+   
+   ;; Optionally set base URI
+   (set-base-uri "https://api.example.com/badges/")
+   
+   ;; Optionally set max supply
+   (set-max-supply u1000)
+   ```
+
+2. **Minting (Minter)**
+   ```clarity
+   ;; Mint a badge to a recipient
+   (mint recipient-address "badge-1.json")
+   ;; Returns (ok u1) - the new token ID
+   ```
+
+3. **Querying Token Information**
+   ```clarity
+   ;; Get full token info including minted-at
+   (get-token-info u1)
+   ;; Returns: { owner: recipient-address, uri: "badge-1.json", minter: minter-address, minted-at: <block-time> }
+   
+   ;; Get just the owner
+   (get-owner u1)
+   
+   ;; Get the full URI (with base-uri if set)
+   (get-token-uri u1)
+   
+   ;; Get minted-at timestamp
+   (get-token-minted-at u1)
+   ```
+
+4. **Transferring (Token Owner)**
+   ```clarity
+   ;; Transfer token to another address
+   (transfer u1 sender-address recipient-address)
+   ```
+
+5. **Burning (Token Owner, if enabled)**
+   ```clarity
+   ;; Enable burning first (admin only)
+   (set-burn-enabled true)
+   
+   ;; Burn token (owner only)
+   (burn u1)
+   ```
+
+### Common Patterns
+
+**Check if minting is allowed:**
+```clarity
+(can-mint) ;; Returns (ok true) or (ok false)
+```
+
+**Get remaining supply:**
+```clarity
+(get-remaining-supply) ;; Returns (ok (some <remaining>)) or (ok none)
+```
+
+**Lock metadata permanently:**
+```clarity
+;; After finalizing all metadata, lock it
+(lock-metadata)
+```
+
+### Testing Recommendations
+
+- Test minting with and without max supply limits
+- Test mint pause/unpause functionality
+- Test burn enable/disable and actual burning
+- Test metadata locking and verify functions fail after lock
+- Test invalid recipient guard with `SP000000000000000000002Q6VF78`
+- Verify `minted-at` timestamps are correctly recorded and retrieved
+- Test base URI concatenation with token URIs
+- Test admin role transfer
+
+### Integration Notes
+
+- The contract is SIP-009 compliant, so it works with standard NFT interfaces
+- Use `get-token-info` for efficient fetching of all token data in a single call
+- The `minted-at` field is useful for quest completion timestamps and analytics
+- Consider locking metadata before mainnet deployment to prevent future changes
+
