@@ -21,35 +21,49 @@ simnet.callPublicFn(
 caller,
 );
 describe("badge-nft", () => {
-it("mints a badge and records uri, minter, owner, and minted-at", () => {const mintResult = mintBadge(alice, "ipfs://badge-1");
-expect(mintResult.result).toBeOk(Cl.uint(1));
-const mintedAtResult = simnet.callReadOnlyFn(
-"badge-nft",
-"get-token-minted-at",
-[Cl.uint(1)],
-alice,
-);
-expect(mintedAtResult.result).toBeOk(expect.anything());
-const mintedAtCv = (mintedAtResult.result as ResponseOkCV<UIntCV>).value;
-expect(mintedAtCv).toBeUint(mintedAtCv.value);
-expect(mintedAtCv.value).toBeGreaterThan(0n);
-const tokenInfo = simnet.callReadOnlyFn(
-"badge-nft",
-"get-token-info",
-[Cl.uint(1)],
-alice,
-);
-expect(tokenInfo.result).toBeOk(
-Cl.tuple({
-owner: principalCV(alice),uri: Cl.stringUtf8("ipfs://badge-1"),
-minter: principalCV(deployer),
-"minted-at": mintedAtCv,
-}),
-);
-const supply = simnet.callReadOnlyFn("badge-nft", "get-total-supply", [],
-alice);
-expect(supply.result).toBeOk(Cl.uint(1));
-});
+  // Test: Verify minting functionality and data recording
+  // This test ensures that minting records all required information including minted-at timestamp
+  it("mints a badge and records uri, minter, owner, and minted-at", () => {
+    // Mint a badge to alice with a specific URI
+    const mintResult = mintBadge(alice, "ipfs://badge-1");
+    // Verify minting succeeded and returned token ID 1
+    expect(mintResult.result).toBeOk(Cl.uint(1));
+    
+    // Retrieve the minted-at timestamp (Clarity 4 feature using stacks-block-time)
+    const mintedAtResult = simnet.callReadOnlyFn(
+      "badge-nft",
+      "get-token-minted-at",
+      [Cl.uint(1)],
+      alice,
+    );
+    // Verify minted-at was recorded successfully
+    expect(mintedAtResult.result).toBeOk(expect.anything());
+    const mintedAtCv = (mintedAtResult.result as ResponseOkCV<UIntCV>).value;
+    // Verify minted-at is a valid uint and greater than 0
+    expect(mintedAtCv).toBeUint(mintedAtCv.value);
+    expect(mintedAtCv.value).toBeGreaterThan(0n);
+    
+    // Get comprehensive token information
+    const tokenInfo = simnet.callReadOnlyFn(
+      "badge-nft",
+      "get-token-info",
+      [Cl.uint(1)],
+      alice,
+    );
+    // Verify all token data is correctly recorded: owner, URI, minter, and minted-at
+    expect(tokenInfo.result).toBeOk(
+      Cl.tuple({
+        owner: principalCV(alice),
+        uri: Cl.stringUtf8("ipfs://badge-1"),
+        minter: principalCV(deployer),
+        "minted-at": mintedAtCv,
+      }),
+    );
+    
+    // Verify total supply was incremented
+    const supply = simnet.callReadOnlyFn("badge-nft", "get-total-supply", [], alice);
+    expect(supply.result).toBeOk(Cl.uint(1));
+  });
 it("rejects minting from a non-minter", () => {
 const mintResult = mintBadge(alice, "ipfs://badge-unauthorized", alice);
 expect(mintResult.result).toBeErr(Cl.uint(101)); // err-not-minter
