@@ -72,16 +72,24 @@ describe("badge-nft", () => {
     // Verify minting was rejected with err-not-minter error code
     expect(mintResult.result).toBeErr(Cl.uint(101)); // err-not-minter
   });
-it("respects the mint pause flag", () => {
-const pause = simnet.callPublicFn(
-"badge-nft",
-"set-mint-paused",
-[Cl.bool(true)],
-deployer,
-);expect(pause.result).toBeOk(Cl.bool(true));
-const mintResult = mintBadge(alice, "ipfs://badge-paused");
-expect(mintResult.result).toBeErr(Cl.uint(108)); // err-mint-paused
-});
+  // Test: Verify mint pause functionality
+  // This test ensures that admin can pause minting and paused state prevents new mints
+  it("respects the mint pause flag", () => {
+    // Admin pauses minting
+    const pause = simnet.callPublicFn(
+      "badge-nft",
+      "set-mint-paused",
+      [Cl.bool(true)],
+      deployer,
+    );
+    // Verify pause was successful
+    expect(pause.result).toBeOk(Cl.bool(true));
+    
+    // Attempt to mint while paused (should fail)
+    const mintResult = mintBadge(alice, "ipfs://badge-paused");
+    // Verify minting was rejected with err-mint-paused error code
+    expect(mintResult.result).toBeErr(Cl.uint(108)); // err-mint-paused
+  });
 it("requires burn toggle and ownership, and clears metadata on burn", ()
 => {
 const mintResult = mintBadge(alice, "ipfs://badge-burn");
