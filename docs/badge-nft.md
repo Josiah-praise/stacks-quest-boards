@@ -40,3 +40,29 @@ The `badge-nft` contract is a SIP-009 compliant non-fungible token (NFT) impleme
 | `u110` | `err-metadata-locked` | Metadata has been permanently locked and cannot be modified |
 | `u111` | `err-burn-disabled` | Burning is currently disabled |
 
+---
+
+## State Variables and Roles
+
+### Roles
+- **Admin** (`contract-admin`): Has full control over contract configuration, metadata, and settings. Can transfer admin role to another principal.
+- **Minter** (`authorized-minter`): Authorized to mint new badge tokens. Set by admin.
+
+### State Variables
+- `contract-admin`: Current admin principal (initialized to deployer)
+- `authorized-minter`: Principal authorized to mint tokens (initialized to deployer)
+- `base-uri`: Optional base URI prefix for all token URIs
+- `max-supply`: Optional maximum supply limit for tokens
+- `last-token-id`: ID of the most recently minted token
+- `total-supply`: Current total number of minted tokens
+- `mint-paused`: Boolean flag to pause/unpause minting
+- `metadata-locked`: Boolean flag indicating if metadata is permanently locked
+- `burn-enabled`: Boolean flag to enable/disable token burning
+- `collection-name`: Collection name (default: "Quest Badge")
+- `collection-symbol`: Collection symbol (default: "QBADGE")
+
+### Token-Level Data Maps
+- `token-uri`: Maps token ID to its URI string
+- `token-minter`: Maps token ID to the principal that minted it
+- `token-minted-at`: Maps token ID to the block time when it was minted (Clarity 4 feature)
+
