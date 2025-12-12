@@ -338,3 +338,66 @@ Burns (destroys) a badge NFT. Only the token owner can burn their token, and bur
 - **`is-metadata-locked`**: Returns `true` if metadata is permanently locked, `false` otherwise
 - **`is-burn-enabled`**: Returns `true` if burning is enabled, `false` otherwise
 
+---
+
+## Clarity 4 Features
+
+### Minted-At Tracking
+
+The contract uses Clarity 4's `stacks-block-time` function to record when each token was minted. This is automatically stored in the `token-minted-at` map during the minting process.
+
+**How it works:**
+- When `mint` is called, the contract records `stacks-block-time` in the `token-minted-at` map
+- The minted-at timestamp is stored as a `uint` representing the block time
+- This data is included in the `get-token-info` response
+- Can be retrieved individually via `get-token-minted-at`
+
+**Example:**
+```clarity
+;; Mint a token
+(mint recipient "https://example.com/badge-1.json")
+
+;; Get minted-at timestamp
+(get-token-minted-at u1) ;; Returns (ok <block-time>)
+
+;; Get full token info including minted-at
+(get-token-info u1) ;; Returns { owner: ..., uri: ..., minter: ..., minted-at: <block-time> }
+```
+
+---
+
+## Limitations and Constraints
+
+### Invalid Recipient Guard
+The contract prevents transfers and mints to the address `SP000000000000000000002Q6VF78`. This is enforced in:
+- `mint` function
+- `transfer` function
+- `set-minter` function
+- `set-admin` function
+
+### Maximum Supply Enforcement
+- If `max-supply` is set, minting will fail once `total-supply` reaches the limit
+- `max-supply` cannot be set below the current `total-supply`
+- Use `clear-max-supply` to remove the limit and allow unlimited minting
+
+### Metadata Locking
+- Once `lock-metadata` is called, the following functions become permanently disabled:
+  - `set-name`
+  - `set-symbol`
+  - `set-token-uri`
+- This is an irreversible action - metadata cannot be unlocked once locked
+
+### Burn Behavior
+- Burning is disabled by default (`burn-enabled` is `false`)
+- Only token owners can burn their own tokens
+- When a token is burned, all associated data is cleaned up:
+  - Token URI is removed
+  - Minter record is deleted
+  - Minted-at record is deleted
+  - Total supply is decremented
+
+### Mint Pause
+- Admin can pause minting via `set-mint-paused`
+- When paused, all `mint` calls will fail with `err-mint-paused`
+- Use `can-mint` read-only function to check if minting is currently allowed
+
