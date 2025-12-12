@@ -64,10 +64,14 @@ describe("badge-nft", () => {
     const supply = simnet.callReadOnlyFn("badge-nft", "get-total-supply", [], alice);
     expect(supply.result).toBeOk(Cl.uint(1));
   });
-it("rejects minting from a non-minter", () => {
-const mintResult = mintBadge(alice, "ipfs://badge-unauthorized", alice);
-expect(mintResult.result).toBeErr(Cl.uint(101)); // err-not-minter
-});
+  // Test: Verify access control - only authorized minter can mint
+  // This test ensures that non-minter addresses cannot mint tokens
+  it("rejects minting from a non-minter", () => {
+    // Attempt to mint as alice (who is not the minter)
+    const mintResult = mintBadge(alice, "ipfs://badge-unauthorized", alice);
+    // Verify minting was rejected with err-not-minter error code
+    expect(mintResult.result).toBeErr(Cl.uint(101)); // err-not-minter
+  });
 it("respects the mint pause flag", () => {
 const pause = simnet.callPublicFn(
 "badge-nft",
