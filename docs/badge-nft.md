@@ -227,3 +227,67 @@ Permanently locks all metadata updates. Once locked, `set-name`, `set-symbol`, a
 
 **Event:** `{ event: "lock-metadata" }`
 
+---
+
+## Public Functions
+
+### `mint`
+**Signature:** `(define-public (mint (recipient principal) (uri (string-utf8 256))))`
+
+Mints a new badge NFT to the specified recipient. Only the authorized minter can call this function.
+
+**Preconditions:**
+- Caller must be the authorized minter
+- Minting must not be paused
+- `recipient` must be a valid recipient (not `SP000000000000000000002Q6VF78`)
+- `uri` must be non-empty
+- Minting must not exceed `max-supply` (if set)
+- Token ID must not already exist
+
+**Behavior:**
+- Generates a new token ID (increments `last-token-id`)
+- Mints the NFT to `recipient`
+- Stores the token URI
+- Records the minter (`tx-sender`) in `token-minter` map
+- Records the mint time using `stacks-block-time` in `token-minted-at` map (Clarity 4 feature)
+- Increments `total-supply`
+
+**Returns:** `(ok token-id)` on success, error code on failure
+
+**Event:** `{ event: "mint", id: token-id, to: recipient, uri: uri }`
+
+### `transfer`
+**Signature:** `(define-public (transfer (token-id uint) (sender principal) (recipient principal)))`
+
+Transfers a badge NFT from one principal to another. SIP-009 compliant transfer function.
+
+**Preconditions:**
+- Token with `token-id` must exist
+- `sender` must be the current owner of the token
+- `recipient` must be a valid recipient (not `SP000000000000000000002Q6VF78`)
+
+**Returns:** `(ok true)` on success, error code on failure
+
+**Event:** `{ event: "transfer", id: token-id, from: sender, to: recipient }`
+
+### `burn`
+**Signature:** `(define-public (burn (token-id uint)))`
+
+Burns (destroys) a badge NFT. Only the token owner can burn their token, and burning must be enabled.
+
+**Preconditions:**
+- Token with `token-id` must exist
+- Caller must be the owner of the token
+- Burning must be enabled (`burn-enabled` must be `true`)
+
+**Behavior:**
+- Burns the NFT
+- Removes token URI from `token-uri` map
+- Removes minter record from `token-minter` map
+- Removes minted-at record from `token-minted-at` map
+- Decrements `total-supply`
+
+**Returns:** `(ok true)` on success, error code on failure
+
+**Event:** `{ event: "burn", id: token-id, by: tx-sender }`
+
